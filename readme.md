@@ -1,4 +1,4 @@
-## A Gutenberg Block
+## A Gutenberg Weather Block
 <div style="text-align:center; padding:1em;">
 <img src="./sreenshot.png" style="border:1px solid #eee; max-width:400px">
 </div>
