@@ -86,3 +86,13 @@ function weather_block_enqueue() {
   ));
 }
 add_action('enqueue_block_editor_assets', 'weather_block_enqueue');
+function weather_block_enqueue_assets() {
+  wp_enqueue_style(
+      'weather-block-style',
+      plugin_dir_url(__FILE__) . 'dist/block.css', // adjust path as needed
+      [],
+      filemtime(plugin_dir_path(__FILE__) . 'dist/block.css')
+  );
+}
+add_action('wp_enqueue_scripts', 'weather_block_enqueue_assets');
+add_action('enqueue_block_editor_assets', 'weather_block_enqueue_assets');

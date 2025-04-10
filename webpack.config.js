@@ -1,6 +1,7 @@
 // webpack.config.js
 const path = require('path');
 const glob = require('glob');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 const entryFiles = glob.sync('./src/**/*.js', { absolute: true });
 
@@ -24,8 +25,21 @@ module.exports = {
                     loader: 'babel-loader', // Use Babel loader
                 },
             },
+            {
+                test: /\.scss$/, // SCSS loader
+                use: [
+                  MiniCssExtractPlugin.loader,
+                  'css-loader',   // Turns CSS into CommonJS
+                  'sass-loader',  // Compiles Sass to CSS
+                ],
+              },
         ],
     },
+    plugins: [
+        new MiniCssExtractPlugin({
+        filename: '[name].css', // Output CSS filename, same as JS entry
+        }),
+    ],
     resolve: {
         extensions: ['.js', '.jsx'], // Resolve these file extensions
     },

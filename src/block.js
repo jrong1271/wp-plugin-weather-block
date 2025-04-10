@@ -1,6 +1,7 @@
 const { registerBlockType } = wp.blocks;
-const { useEffect, useState } = wp.element;
+const { useState } = wp.element;
 const { Spinner, Button, TextControl } = wp.components;
+import './style.scss';
 
 registerBlockType('custom/weather-block', {
     title: 'Weather Block',
@@ -23,7 +24,7 @@ registerBlockType('custom/weather-block', {
         // Fetch weather data when user clicks the button
         const fetchWeather = () => {
             setLoading(true);
-            const apiKey = weatherBlockData.apiKey; // Use the localized API key
+            const apiKey = weatherBlockData.apiKey || ''; // Use the localized API key
             const city = attributes.location; // Get the location from attributes
             const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=imperial`;
 
