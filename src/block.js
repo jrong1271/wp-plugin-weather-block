@@ -72,7 +72,7 @@ registerBlockType('custom/weather-block', {
 
             try {
                 const res = await fetch(
-                    `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`
+                    `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=imperial`
                 );
 
                 if (!res.ok) {

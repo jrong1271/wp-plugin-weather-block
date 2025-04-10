@@ -179,7 +179,7 @@ registerBlockType('custom/weather-block', {
             case 8:
               _context.prev = 8;
               _context.next = 11;
-              return fetch("https://api.openweathermap.org/data/2.5/weather?q=".concat(city, "&appid=").concat(apiKey, "&units=metric"));
+              return fetch("https://api.openweathermap.org/data/2.5/weather?q=".concat(city, "&appid=").concat(apiKey, "&units=imperial"));
             case 11:
               res = _context.sent;
               if (res.ok) {
