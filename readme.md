@@ -5,6 +5,7 @@
 
 #### Description:
 * A WordPress plugin that displays weather information using the Gutenberg block
+* Use a list of cities to populate the autocomplete selections dropdown, when city changes, update weather data.
 * Weather data is fetched from OpenWeatherMap api and saved to post meta; This mean that weather data won't change unless you manually update it. You do have the option to specify the city name when adding the block;
 * API key is **configurable** in the admin setting page for weather block.
 * I didn't want to expose the **apiKey**, although this key is not that important.
