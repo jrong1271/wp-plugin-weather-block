@@ -1,7 +1,19 @@
-const { registerBlockType } = wp.blocks;
-const { useState } = wp.element;
-const { Spinner, Button, TextControl } = wp.components;
 import './style.scss';
+
+const { registerBlockType } = wp.blocks;
+const { useState, Fragment } = wp.element;
+const { Spinner, Button, TextControl, PanelBody, Notice } = wp.components;
+
+const WeatherInfo = ({ location, temperature, description, humidity }) => (
+    <div className="weather-info panel">
+        <h4>Today's Weather in {location}</h4>
+        <ul>
+            <li><strong>Temperature:</strong> {temperature}</li>
+            <li><strong>Condition:</strong> {description}</li>
+            <li><strong>Humidity:</strong> {humidity}</li>
+        </ul>
+    </div>
+);
 
 registerBlockType('custom/weather-block', {
     title: 'Weather Block',
@@ -11,89 +23,105 @@ registerBlockType('custom/weather-block', {
         temperature: { type: 'string' },
         description: { type: 'string' },
         humidity: { type: 'string' },
-        location: { 
+        location: {
             type: 'string',
-            default: 'New York, US', // Default location
-         },
+            default: 'New York, US',
+        },
     },
-    edit: (props) => {
-        const { attributes, setAttributes } = props;
+
+    edit: ({ attributes, setAttributes }) => {
         const [loading, setLoading] = useState(false);
         const [error, setError] = useState(null);
 
-        // Fetch weather data when user clicks the button
-        const fetchWeather = () => {
+        const fetchWeather = async () => {
             setLoading(true);
-            const apiKey = weatherBlockData.apiKey || ''; // Use the localized API key
-            const city = attributes.location; // Get the location from attributes
-            const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=imperial`;
+            setError(null);
 
-            fetch(url)
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then((data) => {
-                    // Update attributes with weather data
-                    setAttributes({
-                        temperature: `${data.main.temp} °C`,
-                        description: data.weather[0].description,
-                        humidity: `${data.main.humidity}%`,
-                        location: data.name,
-                    });
-                    setLoading(false);
-                })
-                .catch((err) => {
-                    setError(err.message);
-                    setLoading(false);
+            const apiKey = weatherBlockData?.apiKey || '';
+            const city = attributes.location.trim();
+
+            if (!apiKey) {
+                setError('API key is missing. Please check plugin settings.');
+                setLoading(false);
+                return;
+            }
+
+            try {
+                const res = await fetch(
+                    `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`
+                );
+
+                if (!res.ok) {
+                    throw new Error('City not found or invalid API key.');
+                }
+
+                const data = await res.json();
+
+                setAttributes({
+                    temperature: `${data.main.temp} °C`,
+                    description: data.weather[0].description,
+                    humidity: `${data.main.humidity}%`,
+                    location: data.name,
                 });
+
+            } catch (err) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
         };
 
-        // Render the block
         return (
-            <div className="weather-block panel">
-                <div className="flex-container">
-                    <TextControl
-                        label="Location"
-                        value={attributes.location}
-                        onChange={(location) => setAttributes({ location })} // Update location attribute
-                        placeholder="Enter a city name..."
-                    />
-                    <Button onClick={fetchWeather} isPrimary>
-                        Fetch Weather
-                    </Button>
-                </div>
-                {loading && <Spinner />}
-                {error && <p>Error fetching weather: {error}</p>}
-                {attributes.temperature && (
-                    <div class="weather-info panel">
-                        <h4>Today's Weather in {attributes.location}</h4>
-                        <ul>
-                            <li>Temperature: {attributes.temperature}</li>
-                            <li>Weather: {attributes.description}</li>
-                            <li>Humidity: {attributes.humidity}</li>
-                        </ul>
+            <Fragment>
+                <div className="weather-block panel">
+                    <div className="flex-container">
+                        <TextControl
+                            label="Location"
+                            value={attributes.location}
+                            onChange={(location) => setAttributes({ location })}
+                            placeholder="Enter a city name..."
+                        />
+                        <Button
+                            onClick={fetchWeather}
+                            isPrimary
+                            disabled={loading}
+                            aria-busy={loading}
+                        >
+                            {loading ? 'Loading…' : 'Fetch Weather'}
+                        </Button>
                     </div>
-                )}
-            </div>
+
+                    {loading && <Spinner />}
+
+                    {error && (
+                        <Notice status="error" isDismissible={false}>
+                            <p>Error: {error}</p>
+                        </Notice>
+                    )}
+
+                    {attributes.temperature && (
+                        <WeatherInfo
+                            location={attributes.location}
+                            temperature={attributes.temperature}
+                            description={attributes.description}
+                            humidity={attributes.humidity}
+                        />
+                    )}
+                </div>
+            </Fragment>
         );
     },
 
-    save: (props) => {
-        const attributes = props.attributes;
-
+    save: ({ attributes }) => {
         return (
-            <div class="weather-info panel">
+            <div className="weather-info panel">
                 <h4>Today's Weather in {attributes.location}</h4>
                 <ul>
-                    <li>Temperature: {attributes.temperature}</li>
-                    <li>Weather: {attributes.description}</li>
-                    <li>Humidity: {attributes.humidity}</li>
+                    <li><strong>Temperature:</strong> {attributes.temperature}</li>
+                    <li><strong>Condition:</strong> {attributes.description}</li>
+                    <li><strong>Humidity:</strong> {attributes.humidity}</li>
                 </ul>
             </div>
-            
         );
     },
 });
