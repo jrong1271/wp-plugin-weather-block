@@ -16,6 +16,7 @@ module.exports = {
         path: path.resolve(__dirname, './dist'), // Output directory
         filename: './[name].js', // Output file name
     },
+    devtool: process.env.NODE_ENV === 'production' ? false : 'source-map',
     module: {
         rules: [
             {

@@ -1,4 +1,18 @@
+.combobox-container {
+  position: relative; /* Position this to act as a reference for the absolute dropdown */
+  z-index: 1; /* Ensure it’s above other elements, if needed */
+  min-height: 3em;
+}
+.combobox-wrapper{
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  background-color:white;
+  width: 250px;
+}
 .weather-info {
+  position: relative;
   ul {
     list-style-type: none;
     padding: 0;
@@ -13,13 +27,4 @@
   padding: 1rem;
   border-radius: 4px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-.flex-container {
-  display: flex;               // Enable flexbox
-  align-items: center;         // Center items vertically
-  gap: 10px;                   // Optional: space between elements
-  margin-bottom: 1rem;         // Optional: space below the container
-  button{
-    margin-bottom: -10px;
-  }
 }

@@ -1,8 +1,8 @@
 import './style.scss';
 
 const { registerBlockType } = wp.blocks;
-const { useState, Fragment } = wp.element;
-const { Spinner, Button, TextControl, PanelBody, Notice } = wp.components;
+const { useState, useEffect, Fragment } = wp.element;
+const { Spinner, Button, ComboboxControl, Notice } = wp.components;
 
 const WeatherInfo = ({ location, temperature, description, humidity }) => (
     <div className="weather-info panel">
@@ -32,13 +32,37 @@ registerBlockType('custom/weather-block', {
     edit: ({ attributes, setAttributes }) => {
         const [loading, setLoading] = useState(false);
         const [error, setError] = useState(null);
+        const [filteredOptions, setFilteredOptions] = useState([]);
+        const [inputValue, setInputValue] = useState(attributes.location);
+
+        const allCities = [
+            { value: 'New York, US', label: 'New York' },
+            { value: 'Los Angeles, US', label: 'Los Angeles' },
+            { value: 'Chicago, US', label: 'Chicago' },
+            { value: 'Houston, US', label: 'Houston' },
+            { value: 'Phoenix, US', label: 'Phoenix' },
+          ];
+
+        // Update filtered options whenever inputValue changes
+        useEffect(() => {
+            if (!inputValue) {
+                setFilteredOptions(allCities);
+                return;
+            }
+            const filtered = allCities.filter((city) =>
+                city.value.toLowerCase().includes(inputValue.toLowerCase())
+            );
+            setFilteredOptions(filtered);
+            fetchWeather();
+        }, [inputValue]);
+
 
         const fetchWeather = async () => {
             setLoading(true);
             setError(null);
 
             const apiKey = weatherBlockData?.apiKey || '';
-            const city = attributes.location.trim();
+            const city = attributes.location;
 
             if (!apiKey) {
                 setError('API key is missing. Please check plugin settings.');
@@ -74,22 +98,32 @@ registerBlockType('custom/weather-block', {
         return (
             <Fragment>
                 <div className="weather-block panel">
-                    <div className="flex-container">
-                        <TextControl
-                            label="Location"
-                            value={attributes.location}
-                            onChange={(location) => setAttributes({ location })}
-                            placeholder="Enter a city name..."
-                        />
-                        <Button
-                            onClick={fetchWeather}
-                            isPrimary
-                            disabled={loading}
-                            aria-busy={loading}
-                        >
-                            {loading ? 'Loading…' : 'Fetch Weather'}
-                        </Button>
+                    <div className="combobox-container"> {/* Relative container */}
+                        <div className="combobox-wrapper">
+                            <ComboboxControl
+                                label="Select a city"
+                                value={inputValue} // Bind to inputValue for control
+                                options={filteredOptions}
+                                onChange={(value) => {
+                                    setInputValue(value); // Update input value
+                                    setAttributes({ location: value }); // Update block attribute
+                                }}
+                                onFilterValueChange={(input) => {
+                                    setInputValue(input); // Update input value as user types
+                                }}
+                                placeholder="Start typing a city name..."
+                            />
+                        </div>
                     </div>
+                    <Button
+                        className="refresh-button"
+                        onClick={fetchWeather}
+                        isPrimary
+                        disabled={loading}
+                        aria-busy={loading}
+                    >
+                        {loading ? 'Loading…' : 'Refresh'}
+                    </Button>
 
                     {loading && <Spinner />}
 
