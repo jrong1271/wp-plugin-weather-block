@@ -53,24 +53,28 @@ registerBlockType('custom/weather-block', {
 
         // Render the block
         return (
-            <div>
-                <TextControl
-                    label="Location"
-                    value={attributes.location}
-                    onChange={(location) => setAttributes({ location })} // Update location attribute
-                    placeholder="Enter a city name..."
-                />
-                <Button onClick={fetchWeather} isPrimary>
-                    Fetch Weather
-                </Button>
+            <div className="weather-block panel">
+                <div className="flex-container">
+                    <TextControl
+                        label="Location"
+                        value={attributes.location}
+                        onChange={(location) => setAttributes({ location })} // Update location attribute
+                        placeholder="Enter a city name..."
+                    />
+                    <Button onClick={fetchWeather} isPrimary>
+                        Fetch Weather
+                    </Button>
+                </div>
                 {loading && <Spinner />}
                 {error && <p>Error fetching weather: {error}</p>}
                 {attributes.temperature && (
-                    <div>
-                        <h2>Today's Weather in {attributes.location}</h2>
-                        <p>Temperature: {attributes.temperature}</p>
-                        <p>Weather: {attributes.description}</p>
-                        <p>Humidity: {attributes.humidity}</p>
+                    <div class="weather-info panel">
+                        <h4>Today's Weather in {attributes.location}</h4>
+                        <ul>
+                            <li>Temperature: {attributes.temperature}</li>
+                            <li>Weather: {attributes.description}</li>
+                            <li>Humidity: {attributes.humidity}</li>
+                        </ul>
                     </div>
                 )}
             </div>
@@ -81,11 +85,13 @@ registerBlockType('custom/weather-block', {
         const attributes = props.attributes;
 
         return (
-            <div>
-                <h2>Today's Weather in {attributes.location}</h2>
-                <p>Temperature: {attributes.temperature}</p>
-                <p>Weather: {attributes.description}</p>
-                <p>Humidity: {attributes.humidity}</p>
+            <div class="weather-info panel">
+                <h4>Today's Weather in {attributes.location}</h4>
+                <ul>
+                    <li>Temperature: {attributes.temperature}</li>
+                    <li>Weather: {attributes.description}</li>
+                    <li>Humidity: {attributes.humidity}</li>
+                </ul>
             </div>
             
         );
